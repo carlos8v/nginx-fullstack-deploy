@@ -1,0 +1,8 @@
+version: '2'
+services:
+  api:
+    build: ./
+    image: nginx-fullstack-deploy/api:latest
+    container_name: nginx-fullstack-deploy_api
+    environment:
+      PORT: 80

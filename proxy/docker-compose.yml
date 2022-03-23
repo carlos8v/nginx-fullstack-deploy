@@ -1,0 +1,20 @@
+version: '2'
+services:
+  proxy:
+    build: ./
+    image: nginx-fullstack-deploy/proxy:latest
+    container_name: nginx-fullstack-deploy_proxy
+    networks:
+      - api_network
+      - web_network
+    ports:
+      - 80:80
+      - 443:443
+
+networks:
+  api_network:
+    external:
+      name: api_default
+  web_network:
+    external:
+      name: web_default

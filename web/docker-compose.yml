@@ -1,0 +1,8 @@
+version: '2'
+services:
+  web:
+    build: ./
+    image: nginx-fullstack-deploy/web:latest
+    container_name: nginx-fullstack-deploy_web
+    ports:
+      - "80"
