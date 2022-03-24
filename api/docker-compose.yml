@@ -2,7 +2,7 @@ version: '2'
 services:
   api:
     build: ./
-    image: nginx-fullstack-deploy/api:latest
+    image: "nginx-fullstack-deploy/api:${tag}"
     container_name: nginx-fullstack-deploy_api
     environment:
       PORT: 80

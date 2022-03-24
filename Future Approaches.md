@@ -1,6 +1,74 @@
 ## Future approaches
 By having a `post-receive` hook from git on the server is possible to configure custom `CI/CD`'s workflows to automate the test and deploy stages of the application.
 
+#### Example code using Docker:
+
+`/repos/git-cd-test.git/hooks/post-receive`
+```bash
+#!/bin/bash
+
+# If any command fails, exit immediately with command's exit status
+set -eo pipefail
+
+TARGET="/var/www/git-cd-test"
+GIT_DIR="/repos/git-cd-test.git"
+
+# Colors
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+no_color='\033[0m'
+
+API_DIR="${TARGET}/api"
+WEB_DIR="${TARGET}/web"
+PROXY_DIR="${TARGET}/proxy"
+
+# Started with 'api/'
+api_pattern="^api/"
+
+# Started with 'web/'
+web_pattern="^web/"
+
+# Check if there are files changed on the `api` folder
+api_changed=$(echo "$CHANGED_FILES" | { grep "$API_PATTERN" || true; }) 
+# Check if there are files changed on the `web` folder
+web_changed=$(echo "$CHANGED_FILES" | { grep "$WEB_PATTERN" || true; })
+
+while read oldrev newrev ref
+do
+  # Get changed files since last commit
+  CHANGED_FILES=$(git diff --name-only oldrev newrev)
+  TAG=$(git rev-parse --short newrev)
+
+  # Get branch name
+  BRANCH=$(echo "$ref" | cut -d/ -f3)
+
+  # Checkout the deploy branch
+  echo -e "\n${green}Ref $ref received. Deploying ${BRANCH} branch to production...${no_color}\n"
+  if git --work-tree=$TARGET --git-dir=$GIT_DIR checkout -f "$BRANCH"; then
+    if [[ -n "$api_changed" ]]; then
+      echo -e "\n${green}Restarting api service...\n${no_color}"
+      cd "${API_DIR}" && tag=latest docker-compose build
+      cd "${API_DIR}" && tag=$TAG docker-compose up --build -d
+    fi
+
+    if [[ -n "$web_changed" ]]; then
+      echo -e "\n${green}Restarting web service...\n${no_color}"
+      cd "${WEB_DIR}" && tag=latest docker-compose build
+      cd "${WEB_DIR}" && tag=$TAG docker-compose up --build -d
+    fi
+
+    echo -e "\n${green}Restarting proxy service...\n${no_color}"
+    cd "${PROXY_DIR}" && tag=latest docker-compose build
+    cd "${PROXY_DIR}" && tag=$TAG docker-compose up --build -d
+  else
+    echo -e "\n${red}Some error occored. Exiting${no_color}"
+    exit 1
+  fi
+done
+exit 0
+```
+
 #### Example code for a simple service update with pm2:
 
 `/repos/git-cd-test.git/hooks/post-receive`

@@ -2,7 +2,7 @@ version: '2'
 services:
   web:
     build: ./
-    image: nginx-fullstack-deploy/web:latest
+    image: "nginx-fullstack-deploy/web:${tag}"
     container_name: nginx-fullstack-deploy_web
     ports:
       - "80"

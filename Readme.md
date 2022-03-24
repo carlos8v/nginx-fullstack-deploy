@@ -2,7 +2,7 @@
 A fullstack project boilerplate to show how a javascript stack application would be deployed using [nginx](https://www.nginx.com) and [Docker](https://www.docker.com/).
 
 ## Overview
-For this project you will have to run `docker-compose up -d` on each project, leaving the `proxy` folder for last.
+For this project you will have to run `tag=latest docker-compose up -d` on each project, leaving the `proxy` folder for last.
 Each `docker-compose.yml` will build (if image has not been built yet) and run a container exposing port `80`.
 
 The **proxy** folder is the `nginx` server which deals with the routing of the services. Mapping the domain `api.local` to the api application and `web.local` domain to the react application.

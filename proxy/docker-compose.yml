@@ -2,7 +2,7 @@ version: '2'
 services:
   proxy:
     build: ./
-    image: nginx-fullstack-deploy/proxy:latest
+    image: "nginx-fullstack-deploy/proxy:${tag}"
     container_name: nginx-fullstack-deploy_proxy
     networks:
       - api_network
